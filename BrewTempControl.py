@@ -13,7 +13,6 @@ import busio
 i2c = busio.I2C(board.SCL, board.SDA)
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
-#from lib import LCD_2inch
 #kivy stuff
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
@@ -42,7 +41,7 @@ device = 0
 
 
 
-class MyDisplayApp(App):
+class BrewTempControlApp(App):
     #global pressure variables
     maxPressure = 0.6
     minPressure = 0.5
@@ -59,8 +58,8 @@ class MyDisplayApp(App):
         # Create a layout
         layout = BoxLayout(orientation='vertical')
         # Create labels for temperature and pressure
-        self.temperature_label = Label(text='Temperature: --')
-        self.pressure_label = Label(text='Pressure: --')
+        self.temperature_label = Label(text='Temperature: --', font_size='30sp')
+        self.pressure_label = Label(text='Pressure: --', font_size='30sp')
         layout.add_widget(self.temperature_label)
         layout.add_widget(self.pressure_label)
         # Schedule the update_sensor_readings method to be called every second
@@ -92,9 +91,15 @@ class MyDisplayApp(App):
         if temperature1 > 95.0:
             self.minPressure = 0.4
             self.maxPressure = 0.5
-        elif temperature1 < 94.0:
+        elif ((temperature1 < 94.0) and (temperature1 > 89)):
             self.maxPressure = 0.6
             self.minPressure = 0.5
+        elif ((temperature1 < 89) and (temperature1 > 80)):
+            self.maxPressure = 0.8
+            self.minPressure = 0.7
+        elif temperature1 < 80:
+            self.maxPressure = 1.2
+            self.minPressure = 1.0
 
         # Get the pressure reading
         pressure = self.read_pressure()
@@ -116,7 +121,7 @@ class MyDisplayApp(App):
 # ...
 
 if __name__ == '__main__':
-    app = MyDisplayApp()
+    app = BrewTempControlApp()
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(app.async_run(async_lib='asyncio'))
