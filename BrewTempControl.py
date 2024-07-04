@@ -88,15 +88,18 @@ class BrewTempControlApp(App):
         self.temperature_label.text = f'Temperature: {temperature1}°C'
 
         # Adjust the pressure thresholds based on the temperature
-        if temperature1 > 95.0:
+        if temperature1 > 94.5:
             self.minPressure = 0.4
             self.maxPressure = 0.5
-        elif ((temperature1 < 94.0) and (temperature1 > 89)):
-            self.maxPressure = 0.6
-            self.minPressure = 0.5
+        elif ((temperature1 < 94.5) and (temperature1 > 93.3)):
+            self.minPressure = 0.45
+            self.maxPressure = 0.55
+        elif ((temperature1 < 93.3) and (temperature1 > 89)):
+            self.maxPressure = 0.65
+            self.minPressure = 0.55
         elif ((temperature1 < 89) and (temperature1 > 80)):
-            self.maxPressure = 0.8
-            self.minPressure = 0.7
+            self.maxPressure = 0.9
+            self.minPressure = 0.8
         elif temperature1 < 80:
             self.maxPressure = 1.2
             self.minPressure = 1.0
