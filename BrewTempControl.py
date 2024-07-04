@@ -19,6 +19,13 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.app import async_runTouchApp
+from kivy.core.window import Window
+from kivy.lang import Builder
+
+
+# Manually load the .kv file
+#Builder.load_file('brewtempcontrol.kv')
+
 
 
 from PIL import Image,ImageDraw,ImageFont,ImageColor
@@ -39,7 +46,8 @@ BL = 18
 bus = 0 
 device = 0 
 
-
+class BrewTempControl(BoxLayout):
+    pass
 
 class BrewTempControlApp(App):
     #global pressure variables
@@ -50,21 +58,29 @@ class BrewTempControlApp(App):
         await self.update_sensor_readings()
 
     def build(self):
+        print("Building the app...")
+        # Load the root widget from the .kv file
+        Builder.unload_file('brewtempcontrol.kv')  # Unload the .kv file if it's already loaded
+        self.root = Builder.load_file('brewtempcontrol.kv')
+        print(f"Root widget after build: {self.root}")
         # Initialize Temperature Sensors
         self.sensor1 = AsyncW1ThermSensor(Sensor.DS18B20, "3c0107d67cb6")
         # SSR setup
         self.ssr_setup()
         
         # Create a layout
-        layout = BoxLayout(orientation='vertical')
+        #layout = BoxLayout(orientation='vertical')
         # Create labels for temperature and pressure
-        self.temperature_label = Label(text='Temperature: --', font_size='30sp')
-        self.pressure_label = Label(text='Pressure: --', font_size='30sp')
-        layout.add_widget(self.temperature_label)
-        layout.add_widget(self.pressure_label)
+        #self.temperature_label = Label(text='Temperature: --', font_size='30sp')
+        #self.pressure_label = Label(text='Pressure: --', font_size='30sp')
+        #layout.add_widget(self.temperature_label)
+        #layout.add_widget(self.pressure_label)
         # Schedule the update_sensor_readings method to be called every second
-        Clock.schedule_interval(lambda dt: asyncio.ensure_future(self.schedule_async_update()), 1)
-        return layout
+        #Clock.schedule_interval(lambda dt: asyncio.ensure_future(self.schedule_async_update()), 1)
+        #return layout
+        print(f"Root widget after build: {self.root}")
+
+        return BrewTempControl()
 
     def ssr_setup(self):
         GPIO.setmode(GPIO.BCM)
@@ -80,23 +96,41 @@ class BrewTempControlApp(App):
         pressure=round((chan.value-2572)/2132, 2)
         return pressure
 
+    def on_start(self):
+        Clock.schedule_once(self.initiate_async_update)
+
+    def initiate_async_update(self, *args):
+        asyncio.ensure_future(self.schedule_async_update())
+
+    async def schedule_async_update(self):
+        print("Waiting 10 seconds...")
+        await asyncio.sleep(10)
+        # Now it's safe to access ids
+        await self.update_sensor_readings()
+
 
     async def update_sensor_readings(self):
+        if self.root:  # Check if root is not None
         # Get the temperature reading
-        temperature1 = round(await self.sensor1.get_temperature(), 1)
+            temperature1 = round(await self.sensor1.get_temperature(), 1)
         # Update the temperature label
-        self.temperature_label.text = f'Temperature: {temperature1}°C'
+            self.root.ids.temperature_label.text = f'Temperature: {temperature1}°C'
+        else:
+            print("Root widget has not been created yet")
 
         # Adjust the pressure thresholds based on the temperature
-        if temperature1 > 95.0:
+        if temperature1 > 94.6:
             self.minPressure = 0.4
             self.maxPressure = 0.5
-        elif ((temperature1 < 94.0) and (temperature1 > 89)):
-            self.maxPressure = 0.6
-            self.minPressure = 0.5
+        elif ((temperature1 < 94.6) and (temperature1 > 93.3)):
+            self.minPressure = 0.45
+            self.maxPressure = 0.55
+        elif ((temperature1 < 93.3) and (temperature1 > 89)):
+            self.maxPressure = 0.65
+            self.minPressure = 0.55
         elif ((temperature1 < 89) and (temperature1 > 80)):
-            self.maxPressure = 0.8
-            self.minPressure = 0.7
+            self.maxPressure = 0.9
+            self.minPressure = 0.8
         elif temperature1 < 80:
             self.maxPressure = 1.2
             self.minPressure = 1.0
@@ -104,7 +138,7 @@ class BrewTempControlApp(App):
         # Get the pressure reading
         pressure = self.read_pressure()
         # Update the pressure label
-        self.pressure_label.text = f'Pressure: {pressure} bar'
+        self.root.ids.pressure_label.text = f'Pressure: {pressure} bar'
 
         # Logic to turn the SSR on or off based on the pressure
         if pressure > self.maxPressure:
