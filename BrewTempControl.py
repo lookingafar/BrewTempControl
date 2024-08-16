@@ -39,9 +39,12 @@ BL = 18
 bus = 0 
 device = 0 
 
-
+logging.basicConfig(filename='app_debug.log', level=logging.DEBUG)
 
 class BrewTempControlApp(App):
+    def debug_log(self, message):
+        logging.debug(message)
+
     #global pressure variables
     maxPressure = 0.6
     minPressure = 0.5
@@ -82,8 +85,11 @@ class BrewTempControlApp(App):
 
 
     async def update_sensor_readings(self):
+        #self.debug_log('Starting update_sensor_readings')
         # Get the temperature reading
         temperature1 = round(await self.sensor1.get_temperature(), 1)
+         # Log temperature
+        #self.debug_log(f'Temperature: {temperature1}')
         # Update the temperature label
         self.temperature_label.text = f'Temperature: {temperature1}°C'
 
@@ -128,7 +134,10 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(app.async_run(async_lib='asyncio'))
+    except Exception as e:
+        logging.error(f'Error occurred: {e}')
     finally:
         # This will run even if the app crashes or is stopped
+        app.ssr_off()  # Ensure SSR is turned off
         GPIO.cleanup()
-        self.ssr_off()
+        logging.info('Application ended and GPIO cleaned up')
