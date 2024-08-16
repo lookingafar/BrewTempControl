@@ -131,3 +131,4 @@ if __name__ == '__main__':
     finally:
         # This will run even if the app crashes or is stopped
         GPIO.cleanup()
+        self.ssr_off()
