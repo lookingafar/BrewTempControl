@@ -63,8 +63,12 @@ class BrewTempControlApp(App):
         # Create labels for temperature and pressure
         self.temperature_label = Label(text='Temperature: --', font_size='30sp')
         self.pressure_label = Label(text='Pressure: --', font_size='30sp')
+        self.maxPressure_label = Label(text='Max. Pressure: --', font_size='30sp')
+        self.minPressure_label = Label(text='Min. Pressure: --', font_size='30sp')
         layout.add_widget(self.temperature_label)
         layout.add_widget(self.pressure_label)
+        layout.add_widget(self.maxPressure_label)
+        layout.add_widget(self.minPressure_label)
         # Schedule the update_sensor_readings method to be called every second
         Clock.schedule_interval(lambda dt: asyncio.ensure_future(self.schedule_async_update()), 1)
         return layout
@@ -120,6 +124,8 @@ class BrewTempControlApp(App):
         pressure = self.read_pressure()
         # Update the pressure label
         self.pressure_label.text = f'Pressure: {pressure} bar'
+        self.maxPressure_label.text = f'Max. Pressure: {self.maxPressure} bar'
+        self.minPressure_label.text = f'Min. Pressure: {self.minPressure} bar'
 
         # Logic to turn the SSR on or off based on the pressure
         if pressure > self.maxPressure:
