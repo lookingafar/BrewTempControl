@@ -93,8 +93,14 @@ class BrewTempControlApp(App):
         # Update the temperature label
         self.temperature_label.text = f'Temperature: {temperature1}°C'
 
+        # Check the current time to adjust pressure thresholds
+        now = datetime.datetime.now()
+
         # Adjust the pressure thresholds based on the temperature
-        if temperature1 > 94.5:
+        if now.hour >= 19 or now.hour < 5:  # Between 6 p.m. and 5 a.m.
+            self.minPressure = 0.2
+            self.maxPressure = 0.25
+        elif temperature1 > 94.5:
             self.minPressure = 0.4
             self.maxPressure = 0.5
         elif ((temperature1 < 94.5) and (temperature1 > 93.3)):
