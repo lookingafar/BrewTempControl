@@ -16,6 +16,7 @@ from adafruit_ads1x15.analog_in import AnalogIn
 #kivy stuff
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.app import async_runTouchApp
@@ -59,7 +60,7 @@ class BrewTempControlApp(App):
         self.ssr_setup()
         
         # Create a layout
-        layout = BoxLayout(orientation='vertical')
+        layout = GridLayout(cols=2, rows=3)
         # Create labels for temperature and pressure
         self.temperature_label = Label(text='Temperature: --', font_size='30sp')
         self.pressure_label = Label(text='Pressure: --', font_size='30sp')
