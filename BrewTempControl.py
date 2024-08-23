@@ -17,6 +17,7 @@ from adafruit_ads1x15.analog_in import AnalogIn
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.app import async_runTouchApp
@@ -70,6 +71,8 @@ class BrewTempControlApp(App):
         layout.add_widget(self.pressure_label)
         layout.add_widget(self.maxPressure_label)
         layout.add_widget(self.minPressure_label)
+        layout.add_widget(Button(text='Pressure up'))
+        layout.add_widget(Button(text='Pressure down'))
         # Schedule the update_sensor_readings method to be called every second
         Clock.schedule_interval(lambda dt: asyncio.ensure_future(self.schedule_async_update()), 1)
         return layout
