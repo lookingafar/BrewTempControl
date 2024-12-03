@@ -71,8 +71,8 @@ class BrewTempControlApp(App):
         layout.add_widget(self.pressure_label)
         layout.add_widget(self.maxPressure_label)
         layout.add_widget(self.minPressure_label)
-        layout.add_widget(Button(text='Pressure up'))
-        layout.add_widget(Button(text='Pressure down'))
+        layout.add_widget(Button(text='Heater on'))
+        layout.add_widget(Button(text='Heater off'))
         # Schedule the update_sensor_readings method to be called every second
         Clock.schedule_interval(lambda dt: asyncio.ensure_future(self.schedule_async_update()), 1)
         return layout
@@ -115,8 +115,8 @@ class BrewTempControlApp(App):
             self.minPressure = 0.45
             self.maxPressure = 0.55
         elif ((temperature1 < 93.3) and (temperature1 > 89)):
-            self.maxPressure = 0.65
-            self.minPressure = 0.55
+            self.maxPressure = 0.75
+            self.minPressure = 0.65
         elif ((temperature1 < 89) and (temperature1 > 80)):
             self.maxPressure = 0.9
             self.minPressure = 0.8
