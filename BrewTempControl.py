@@ -21,6 +21,8 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.app import async_runTouchApp
+from kivy.uix.togglebutton import ToggleButton
+from kivy.uix.behaviors import ToggleButtonBehavior
 
 
 from PIL import Image,ImageDraw,ImageFont,ImageColor
@@ -71,8 +73,8 @@ class BrewTempControlApp(App):
         layout.add_widget(self.pressure_label)
         layout.add_widget(self.maxPressure_label)
         layout.add_widget(self.minPressure_label)
-        layout.add_widget(Button(text='Heater on'))
-        layout.add_widget(Button(text='Heater off'))
+        layout.add_widget(ToggleButton(text='Off', state='normal', font_size='30sp'))
+        layout.add_widget(Button(text='Timer', font_size='30sp'))
         # Schedule the update_sensor_readings method to be called every second
         Clock.schedule_interval(lambda dt: asyncio.ensure_future(self.schedule_async_update()), 1)
         return layout
