@@ -22,7 +22,7 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.app import async_runTouchApp
 from kivy.uix.togglebutton import ToggleButton
-from kivy.uix.behaviors import ToggleButtonBehavior
+#from kivy.uix.behaviors import ToggleButtonBehavior
 
 
 from PIL import Image,ImageDraw,ImageFont,ImageColor
@@ -52,6 +52,7 @@ class BrewTempControlApp(App):
     #global pressure variables
     maxPressure = 0.6
     minPressure = 0.5
+    ssr_enabled = True  # Flag to control if SSR logic is enabled or disabled
 
     async def schedule_async_update(self):
         await self.update_sensor_readings()
@@ -73,8 +74,13 @@ class BrewTempControlApp(App):
         layout.add_widget(self.pressure_label)
         layout.add_widget(self.maxPressure_label)
         layout.add_widget(self.minPressure_label)
-        layout.add_widget(ToggleButton(text='Off', state='normal', font_size='30sp'))
-        layout.add_widget(Button(text='Timer', font_size='30sp'))
+
+        # Create the toggle button for SSR control
+        self.toggle_button = ToggleButton(text='On', state='down', font_size='30sp')
+        self.toggle_button.bind(on_press=self.toggle_ssr)  # Bind the function to the button press
+        layout.add_widget(self.toggle_button)
+        #layout.add_widget(ToggleButton(text='Off', state='normal', font_size='30sp'))
+        #layout.add_widget(Button(text='Timer', font_size='30sp'))
         # Schedule the update_sensor_readings method to be called every second
         Clock.schedule_interval(lambda dt: asyncio.ensure_future(self.schedule_async_update()), 1)
         return layout
@@ -88,6 +94,16 @@ class BrewTempControlApp(App):
 
     def ssr_off(self):
         GPIO.output(SSR, GPIO.LOW)
+
+    def toggle_ssr(self, instance):
+        """This function will toggle the SSR logic and update the button text."""
+        if instance.state == 'down':
+            self.ssr_enabled = True  # Enable SSR logic when the button is "On"
+            instance.text = 'On'  # Update button text to "On"
+        else:
+            self.ssr_enabled = False  # Disable SSR logic when the button is "Off"
+            self.ssr_off()  # Ensure SSR is off
+            instance.text = 'Off'  # Update button text to "Off"
     
     def read_pressure(self):
         pressure=round((chan.value-2572)/2132, 2)
@@ -102,6 +118,10 @@ class BrewTempControlApp(App):
         #self.debug_log(f'Temperature: {temperature1}')
         # Update the temperature label
         self.temperature_label.text = f'Temperature: {temperature1}°C'
+
+        # If SSR logic is disabled, don't run SSR control
+        if not self.ssr_enabled:
+            return
 
         # Check the current time to adjust pressure thresholds
         now = datetime.datetime.now()
