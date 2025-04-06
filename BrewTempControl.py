@@ -15,6 +15,7 @@ import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 #kivy stuff
 from kivy.app import App
+from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
@@ -44,6 +45,9 @@ bus = 0
 device = 0 
 
 logging.basicConfig(filename='app_debug.log', level=logging.DEBUG)
+
+# Set window size
+Window.size = (800, 600)
 
 class BrewTempControlApp(App):
     def debug_log(self, message):
@@ -96,14 +100,26 @@ class BrewTempControlApp(App):
         GPIO.output(SSR, GPIO.LOW)
 
     def toggle_ssr(self, instance):
-        """This function will toggle the SSR logic and update the button text."""
-        if instance.state == 'down':
-            self.ssr_enabled = True  # Enable SSR logic when the button is "On"
-            instance.text = 'On'  # Update button text to "On"
-        else:
+        """This function will toggle the SSR logic and update the button text after a small delay."""
+        # Disable the button temporarily to prevent rapid toggling
+        instance.disabled = True
+
+        # Schedule the actual toggle logic after a small delay (e.g., 0.2 seconds)
+        Clock.schedule_once(lambda dt: self._delayed_toggle_ssr(instance), 0.1)
+
+    def _delayed_toggle_ssr(self, instance):
+        """This function handles the actual toggling after the delay."""
+        # Re-enable the button
+        instance.disabled = False
+
+        # Perform the toggle logic
+        if instance.state == 'normal':
             self.ssr_enabled = False  # Disable SSR logic when the button is "Off"
             self.ssr_off()  # Ensure SSR is off
             instance.text = 'Off'  # Update button text to "Off"
+        else:
+            self.ssr_enabled = True  # Enable SSR logic when the button is "On"
+            instance.text = 'On'  # Update button text to "On"
     
     def read_pressure(self):
         pressure=round((chan.value-2572)/2132, 2)
@@ -140,8 +156,8 @@ class BrewTempControlApp(App):
             self.maxPressure = 0.75
             self.minPressure = 0.65
         elif ((temperature1 < 89) and (temperature1 > 80)):
-            self.maxPressure = 0.9
-            self.minPressure = 0.8
+            self.maxPressure = 1.1
+            self.minPressure = 1.0
         elif temperature1 < 80:
             self.maxPressure = 1.2
             self.minPressure = 1.0
