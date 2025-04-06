@@ -153,8 +153,8 @@ class BrewTempControlApp(App):
             self.minPressure = 0.45
             self.maxPressure = 0.55
         elif ((temperature1 < 93.3) and (temperature1 > 89)):
-            self.maxPressure = 0.75
-            self.minPressure = 0.65
+            self.maxPressure = 0.95
+            self.minPressure = 0.85
         elif ((temperature1 < 89) and (temperature1 > 80)):
             self.maxPressure = 1.1
             self.minPressure = 1.0
