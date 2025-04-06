@@ -70,10 +70,10 @@ class BrewTempControlApp(App):
         # Create a layout
         layout = GridLayout(cols=2, rows=3)
         # Create labels for temperature and pressure
-        self.temperature_label = Label(text='Temperature: --', font_size='40sp')
-        self.pressure_label = Label(text='Pressure: --', font_size='40sp')
-        self.maxPressure_label = Label(text='Max. Pressure: --', font_size='40sp')
-        self.minPressure_label = Label(text='Min. Pressure: --', font_size='40sp')
+        self.temperature_label = Label(text='Temperature: --', font_size='30sp')
+        self.pressure_label = Label(text='Pressure: --', font_size='30sp')
+        self.maxPressure_label = Label(text='Max. Pressure: --', font_size='30sp')
+        self.minPressure_label = Label(text='Min. Pressure: --', font_size='30sp')
         layout.add_widget(self.temperature_label)
         layout.add_widget(self.pressure_label)
         layout.add_widget(self.maxPressure_label)
